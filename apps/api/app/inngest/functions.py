@@ -13,7 +13,6 @@ from app.inngest.client import inngest_client
     fn_id="ingest-document",
     trigger=inngest.TriggerEvent(event="nexusflow/document.ingest"),
     retries=3,
-    timeout="10m",
 )
 async def ingest_document_fn(ctx: inngest.Context, step: inngest.Step) -> dict:
     """Background function: process and embed an uploaded document."""
@@ -36,7 +35,6 @@ async def ingest_document_fn(ctx: inngest.Context, step: inngest.Step) -> dict:
     fn_id="run-workflow",
     trigger=inngest.TriggerEvent(event="nexusflow/workflow.run"),
     retries=2,
-    timeout="30m",
     concurrency=[inngest.Concurrency(limit=5)],
 )
 async def run_workflow_fn(ctx: inngest.Context, step: inngest.Step) -> dict:
