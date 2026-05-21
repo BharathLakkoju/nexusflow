@@ -15,7 +15,7 @@ from app.middleware.auth import UserInfo, get_current_user
 from app.middleware.rbac import RequireAdmin, RequireOwner, RequireViewer
 from app.models.models import Organization, OrganizationMember
 from app.schemas.schemas import (
-    MemberInviteRequest,
+    MemberInvite,
     MemberResponse,
     OrgCreate,
     OrgResponse,
@@ -76,7 +76,7 @@ async def list_members(
 @router.post("/{org_id}/members", response_model=MemberResponse, status_code=status.HTTP_201_CREATED)
 async def invite_member(
     org_id: UUID,
-    body: MemberInviteRequest,
+    body: MemberInvite,
     current_user: UserInfo = Depends(RequireAdmin),
     db: AsyncSession = Depends(get_db),
 ) -> MemberResponse:

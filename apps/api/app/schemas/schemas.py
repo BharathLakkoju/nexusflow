@@ -384,6 +384,11 @@ class MemorySearchRequest(BaseModel):
     agent_id: Optional[uuid.UUID] = None
 
 
+class MemorySearchResponse(BaseModel):
+    results: list[MemoryResponse]
+    total: int
+
+
 class MemoryResponse(BaseModel):
     id: uuid.UUID
     memory_type: str

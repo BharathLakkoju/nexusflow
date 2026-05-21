@@ -4,6 +4,7 @@ API Keys router: create and manage API keys for org programmatic access.
 """
 import hashlib
 import secrets
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -15,7 +16,7 @@ from app.middleware.auth import UserInfo
 from app.middleware.rbac import RequireAdmin, RequireViewer
 from app.models.models import ApiKey
 from app.schemas.schemas import (
-    ApiKeyCreateRequest,
+    ApiKeyCreate,
     ApiKeyCreateResponse,
     ApiKeyResponse,
 )
@@ -26,7 +27,7 @@ router = APIRouter(prefix="/organizations/{org_id}/keys", tags=["api-keys"])
 @router.post("", response_model=ApiKeyCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_api_key(
     org_id: UUID,
-    body: ApiKeyCreateRequest,
+    body: ApiKeyCreate,
     current_user: UserInfo = Depends(RequireAdmin),
     db: AsyncSession = Depends(get_db),
 ) -> ApiKeyCreateResponse:
@@ -35,6 +36,9 @@ async def create_api_key(
     raw_key = "nf_" + secrets.token_hex(24)
     key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
     key_prefix = raw_key[:10]
+    expires_at = None
+    if body.expires_in_days is not None:
+        expires_at = datetime.now(timezone.utc) + timedelta(days=body.expires_in_days)
 
     api_key = ApiKey(
         org_id=org_id,
@@ -42,8 +46,8 @@ async def create_api_key(
         key_hash=key_hash,
         key_prefix=key_prefix,
         created_by=current_user.user_id,
-        scopes=body.scopes or ["*"],
-        expires_at=body.expires_at,
+        permissions=body.permissions,
+        expires_at=expires_at,
     )
     db.add(api_key)
     await db.commit()
@@ -54,7 +58,8 @@ async def create_api_key(
         name=api_key.name,
         key=raw_key,  # Only returned once
         key_prefix=key_prefix,
-        scopes=api_key.scopes,
+        permissions=api_key.permissions,
+        last_used_at=api_key.last_used_at,
         created_at=api_key.created_at,
         expires_at=api_key.expires_at,
     )
@@ -67,7 +72,7 @@ async def list_api_keys(
     db: AsyncSession = Depends(get_db),
 ) -> list[ApiKeyResponse]:
     result = await db.execute(
-        select(ApiKey).where(ApiKey.org_id == org_id, ApiKey.is_active == True)
+        select(ApiKey).where(ApiKey.org_id == org_id)
     )
     keys = result.scalars().all()
     return [ApiKeyResponse.model_validate(k) for k in keys]
@@ -86,5 +91,5 @@ async def revoke_api_key(
     key = result.scalar_one_or_none()
     if not key:
         raise HTTPException(status_code=404, detail="API key not found")
-    key.is_active = False
+    await db.delete(key)
     await db.commit()
