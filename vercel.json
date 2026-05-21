@@ -1,24 +1,3 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "cd apps/web && npm install && npm run build",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "npm install",
-  "devCommand": "cd apps/web && npm run dev",
-  "rewrites": [
-    {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth/:path*"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
-      ]
-    }
-  ]
+  "$comment": "Vercel config lives in apps/web/vercel.json — set Root Directory to apps/web in Vercel project settings"
 }
