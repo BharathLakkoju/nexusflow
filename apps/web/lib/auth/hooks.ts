@@ -2,6 +2,12 @@
 
 import { authClient } from "./client";
 
+type AuthTokenResponse = {
+  data?: {
+    token?: string | null;
+  } | null;
+};
+
 /**
  * Drop-in replacement for Stack Auth's useUser().
  * Returns null when unauthenticated, otherwise a user object with
@@ -11,6 +17,7 @@ export function useUser() {
   const { data: session } = authClient.useSession();
   if (!session?.user) return null;
   const u = session.user;
+  const sessionToken = session.session?.token;
   return {
     ...u,
     /** Stack Auth compat: maps to Better Auth `name` */
@@ -19,8 +26,10 @@ export function useUser() {
     primaryEmail: u.email,
     /** Stack Auth compat: returns { accessToken } for bearer auth */
     getAuthJson: async (): Promise<{ accessToken: string } | null> => {
-      const result = await authClient.token();
-      return result.data ? { accessToken: result.data.token } : null;
+      if (sessionToken) return { accessToken: sessionToken };
+
+      const result = (await authClient.token()) as AuthTokenResponse;
+      return result.data?.token ? { accessToken: result.data.token } : null;
     },
   };
 }
