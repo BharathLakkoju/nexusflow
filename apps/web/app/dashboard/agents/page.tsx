@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { agentsApi, type Agent } from "@/lib/api";
 import { DEMO_AGENTS } from "@/lib/demo-data";
+import { isDemoMode } from "@/lib/demo-mode";
 import { useSSE } from "@/hooks/useSSE";
 import { formatDate } from "@/lib/utils";
 
@@ -130,12 +131,23 @@ export default function AgentsPage() {
   const [creating, setCreating] = useState(false);
 
   const load = async () => {
-    const t = await user?.getAuthJson();
-    if (!t?.accessToken) return;
-    setToken(t.accessToken);
-    const list = await agentsApi.list(t.accessToken);
-    setAgents(list.length > 0 ? list : DEMO_AGENTS);
-    setLoading(false);
+    if (isDemoMode()) {
+      setAgents(DEMO_AGENTS);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const t = await user?.getAuthJson();
+      if (!t?.accessToken) return;
+      setToken(t.accessToken);
+      const list = await agentsApi.list(t.accessToken);
+      setAgents(list.length > 0 ? list : DEMO_AGENTS);
+    } catch {
+      setAgents(DEMO_AGENTS);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

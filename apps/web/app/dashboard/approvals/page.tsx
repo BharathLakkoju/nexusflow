@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { approvalsApi, type HumanApproval } from "@/lib/api";
 import { DEMO_APPROVALS } from "@/lib/demo-data";
+import { isDemoMode } from "@/lib/demo-mode";
 import { formatDate, truncate } from "@/lib/utils";
 
 export default function ApprovalsPage() {
@@ -18,12 +19,23 @@ export default function ApprovalsPage() {
   const [token, setToken] = useState("");
 
   const load = async () => {
-    const t = await user?.getAuthJson();
-    if (!t?.accessToken) return;
-    setToken(t.accessToken);
-    const list = await approvalsApi.list(t.accessToken);
-    setApprovals(list.length > 0 ? list : DEMO_APPROVALS);
-    setLoading(false);
+    if (isDemoMode()) {
+      setApprovals(DEMO_APPROVALS);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const t = await user?.getAuthJson();
+      if (!t?.accessToken) return;
+      setToken(t.accessToken);
+      const list = await approvalsApi.list(t.accessToken);
+      setApprovals(list.length > 0 ? list : DEMO_APPROVALS);
+    } catch {
+      setApprovals(DEMO_APPROVALS);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

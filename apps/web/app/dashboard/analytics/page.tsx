@@ -20,6 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { analyticsApi, type AnalyticsDashboard } from "@/lib/api";
 import { DEMO_ANALYTICS } from "@/lib/demo-data";
+import { isDemoMode } from "@/lib/demo-mode";
 import { formatCost, formatTokens } from "@/lib/utils";
 
 const COLORS = [
@@ -38,8 +39,17 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const load = async () => {
+      if (isDemoMode()) {
+        setData(DEMO_ANALYTICS);
+        setLoading(false);
+        return;
+      }
+
       const t = await user?.getAuthJson();
-      if (!t?.accessToken) return;
+      if (!t?.accessToken) {
+        setLoading(false);
+        return;
+      }
       try {
         const dash = await analyticsApi.dashboard(30, t.accessToken);
         setData(dash);

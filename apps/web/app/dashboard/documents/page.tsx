@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { documentsApi, type Document } from "@/lib/api";
 import { DEMO_DOCUMENTS } from "@/lib/demo-data";
+import { isDemoMode } from "@/lib/demo-mode";
 import { formatDate, truncate } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<
@@ -46,12 +47,23 @@ export default function DocumentsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
-    const t = await user?.getAuthJson();
-    if (!t?.accessToken) return;
-    setToken(t.accessToken);
-    const list = await documentsApi.list(t.accessToken);
-    setDocs(list.length > 0 ? list : DEMO_DOCUMENTS);
-    setLoading(false);
+    if (isDemoMode()) {
+      setDocs(DEMO_DOCUMENTS);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const t = await user?.getAuthJson();
+      if (!t?.accessToken) return;
+      setToken(t.accessToken);
+      const list = await documentsApi.list(t.accessToken);
+      setDocs(list.length > 0 ? list : DEMO_DOCUMENTS);
+    } catch {
+      setDocs(DEMO_DOCUMENTS);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

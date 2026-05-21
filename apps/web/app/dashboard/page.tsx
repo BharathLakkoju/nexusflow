@@ -24,7 +24,9 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { analyticsApi, demoApi, type AnalyticsDashboard } from "@/lib/api";
+import { analyticsApi, type AnalyticsDashboard } from "@/lib/api";
+import { DEMO_ANALYTICS } from "@/lib/demo-data";
+import { enableDemoMode, isDemoMode } from "@/lib/demo-mode";
 import { formatCost, formatTokens } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -37,6 +39,13 @@ export default function DashboardPage() {
   const [seedMessage, setSeedMessage] = useState("");
 
   const loadDashboard = useCallback(async () => {
+    if (isDemoMode()) {
+      setData(DEMO_ANALYTICS);
+      setSeedDone(true);
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = await user?.getAuthJson();
       if (!token?.accessToken) return;
@@ -58,19 +67,10 @@ export default function DashboardPage() {
     setSeedError("");
     setSeedMessage("");
     try {
-      const token = await user?.getAuthJson();
-      if (!token?.accessToken) {
-        throw new Error("Sign in again before loading demo data.");
-      }
-      const result = await demoApi.seed(token.accessToken);
+      enableDemoMode();
+      setData(DEMO_ANALYTICS);
       setSeedDone(true);
-      setSeedMessage(
-        result.seeded
-          ? "Demo data loaded. Refreshing your dashboard..."
-          : result.reason ?? "Demo data is already available.",
-      );
-      // Reload analytics after seeding
-      await loadDashboard();
+      setSeedMessage("Demo data loaded.");
     } catch (err: unknown) {
       setSeedError(
         err instanceof Error ? err.message : "Demo data could not be loaded.",

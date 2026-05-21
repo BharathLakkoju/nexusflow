@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { workflowsApi, type Workflow } from "@/lib/api";
 import { DEMO_WORKFLOWS } from "@/lib/demo-data";
+import { isDemoMode } from "@/lib/demo-mode";
 import { formatDate } from "@/lib/utils";
 
 const STATUS_ICON: Record<string, React.ReactNode> = {
@@ -39,12 +40,19 @@ export default function WorkflowsPage() {
   const [executing, setExecuting] = useState<string | null>(null);
 
   const load = async () => {
+    if (isDemoMode()) {
+      setWorkflows(DEMO_WORKFLOWS);
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = await user?.getAuthJson();
       if (!token?.accessToken) return;
       const list = await workflowsApi.list(token.accessToken);
       setWorkflows(list.length > 0 ? list : DEMO_WORKFLOWS);
     } catch {
+      setWorkflows(DEMO_WORKFLOWS);
     } finally {
       setLoading(false);
     }
