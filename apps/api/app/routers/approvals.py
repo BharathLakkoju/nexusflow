@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.middleware.auth import UserInfo
 from app.middleware.rbac import RequireMember, RequireViewer
-from app.models.models import HumanApproval
+from app.models.models import HumanApproval, WorkflowExecution
 from app.schemas.schemas import ApprovalAction, ApprovalResponse
 
 router = APIRouter(prefix="/approvals", tags=["approvals"])
@@ -22,8 +22,9 @@ async def list_pending_approvals(
 ) -> list[ApprovalResponse]:
     result = await db.execute(
         select(HumanApproval)
+        .join(WorkflowExecution, HumanApproval.execution_id == WorkflowExecution.id)
         .where(
-            HumanApproval.org_id == current_user.org_id,
+            WorkflowExecution.org_id == current_user.org_id,
             HumanApproval.status == "pending",
         )
         .order_by(HumanApproval.created_at.desc())
@@ -40,9 +41,11 @@ async def action_approval(
     db: AsyncSession = Depends(get_db),
 ) -> ApprovalResponse:
     result = await db.execute(
-        select(HumanApproval).where(
+        select(HumanApproval)
+        .join(WorkflowExecution, HumanApproval.execution_id == WorkflowExecution.id)
+        .where(
             HumanApproval.id == approval_id,
-            HumanApproval.org_id == current_user.org_id,
+            WorkflowExecution.org_id == current_user.org_id,
         )
     )
     approval = result.scalar_one_or_none()
@@ -52,8 +55,11 @@ async def action_approval(
         raise HTTPException(status_code=409, detail=f"Approval is already '{approval.status}'")
 
     approval.status = body.action  # "approved" or "rejected"
-    approval.responded_by = current_user.user_id
-    approval.response_comment = body.comment
+    approval.approved_by = current_user.user_id
+    approval.response_data = {
+        **(body.response_data or {}),
+        **({"comment": body.comment} if body.comment else {}),
+    } or None
     await db.commit()
     await db.refresh(approval)
     return ApprovalResponse.model_validate(approval)

@@ -58,12 +58,27 @@ export const workflowsApi = {
 };
 
 // ---- Agent endpoints ----
+type AgentApiResponse = Omit<Agent, "agent_type" | "updated_at"> & {
+  type?: string;
+  agent_type?: string;
+  updated_at?: string;
+};
+
+function normalizeAgent(agent: AgentApiResponse): Agent {
+  return {
+    ...agent,
+    agent_type: agent.agent_type ?? agent.type ?? "custom",
+    updated_at: agent.updated_at ?? agent.created_at,
+  };
+}
+
 export const agentsApi = {
-  list: (token: string) => apiFetch<Agent[]>("/agents", { token }),
+  list: async (token: string) =>
+    (await apiFetch<AgentApiResponse[]>("/agents", { token })).map(normalizeAgent),
   create: (body: Partial<Agent>, token: string) =>
-    apiFetch<Agent>("/agents", { method: "POST", body, token }),
+    apiFetch<AgentApiResponse>("/agents", { method: "POST", body, token }).then(normalizeAgent),
   update: (id: string, body: Partial<Agent>, token: string) =>
-    apiFetch<Agent>(`/agents/${id}`, { method: "PUT", body, token }),
+    apiFetch<AgentApiResponse>(`/agents/${id}`, { method: "PUT", body, token }).then(normalizeAgent),
   delete: (id: string, token: string) =>
     apiFetch<void>(`/agents/${id}`, { method: "DELETE", token }),
   run: (id: string, input: { task: string; [k: string]: unknown }, token: string) =>
@@ -108,10 +123,27 @@ export const memoryApi = {
 };
 
 // ---- Approval endpoints ----
+type ApprovalApiResponse = HumanApproval & {
+  request_data?: {
+    message?: string;
+    context?: unknown;
+  };
+};
+
+function normalizeApproval(approval: ApprovalApiResponse): HumanApproval {
+  return {
+    ...approval,
+    message: approval.message ?? approval.request_data?.message ?? "",
+    context: approval.context ?? approval.request_data?.context,
+  };
+}
+
 export const approvalsApi = {
-  list: (token: string) => apiFetch<HumanApproval[]>("/approvals", { token }),
+  list: async (token: string) =>
+    (await apiFetch<ApprovalApiResponse[]>("/approvals", { token })).map(normalizeApproval),
   action: (id: string, action: "approved" | "rejected", comment: string | undefined, token: string) =>
-    apiFetch<HumanApproval>(`/approvals/${id}/action`, { method: "POST", body: { action, comment }, token }),
+    apiFetch<ApprovalApiResponse>(`/approvals/${id}/action`, { method: "POST", body: { action, comment }, token })
+      .then(normalizeApproval),
 };
 
 // ---- Demo seed ----
@@ -168,6 +200,7 @@ export interface Agent {
   id: string;
   name: string;
   description?: string;
+  type?: string;
   agent_type: string;
   model: string;
   system_prompt?: string;

@@ -33,6 +33,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
   const [seedDone, setSeedDone] = useState(false);
+  const [seedError, setSeedError] = useState("");
+  const [seedMessage, setSeedMessage] = useState("");
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -53,16 +55,26 @@ export default function DashboardPage() {
 
   const handleSeedDemo = async () => {
     setSeeding(true);
+    setSeedError("");
+    setSeedMessage("");
     try {
       const token = await user?.getAuthJson();
-      if (!token?.accessToken) return;
-      await demoApi.seed(token.accessToken);
+      if (!token?.accessToken) {
+        throw new Error("Sign in again before loading demo data.");
+      }
+      const result = await demoApi.seed(token.accessToken);
       setSeedDone(true);
+      setSeedMessage(
+        result.seeded
+          ? "Demo data loaded. Refreshing your dashboard..."
+          : result.reason ?? "Demo data is already available.",
+      );
       // Reload analytics after seeding
       await loadDashboard();
-    } catch {
-      // Silently ignore if already seeded
-      setSeedDone(true);
+    } catch (err: unknown) {
+      setSeedError(
+        err instanceof Error ? err.message : "Demo data could not be loaded.",
+      );
     } finally {
       setSeeding(false);
     }
@@ -122,6 +134,15 @@ export default function DashboardPage() {
             {seeding ? "Seeding…" : "Seed Demo Data"}
           </button>
         </div>
+      )}
+      {(seedError || seedMessage) && (
+        <p
+          className={`text-sm ${
+            seedError ? "text-red-600" : "text-brown-600"
+          }`}
+        >
+          {seedError || seedMessage}
+        </p>
       )}
 
       {/* Stats */}

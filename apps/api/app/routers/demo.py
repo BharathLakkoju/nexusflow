@@ -5,6 +5,7 @@ authenticated user's organisation if none exist yet.
 Idempotent: safe to call multiple times.
 """
 import uuid
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Any
 
@@ -17,7 +18,9 @@ from app.middleware.auth import UserInfo
 from app.middleware.rbac import RequireMember
 from app.models.models import (
     Agent,
+    AnalyticsEvent,
     Document,
+    HumanApproval,
     Memory,
     Workflow,
     WorkflowExecution,
@@ -301,33 +304,76 @@ def _demo_memories(org_id: uuid.UUID) -> list[dict[str, Any]]:
     ]
 
 
-def _demo_executions_and_approvals(
-    org_id: uuid.UUID, user_id: str
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def _demo_activity(
+    org_id: uuid.UUID,
+    user_id: str,
+    workflow_ids: list[uuid.UUID],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    now = datetime.now(timezone.utc)
     exec_id_1 = uuid.uuid4()
     exec_id_2 = uuid.uuid4()
+    exec_id_3 = uuid.uuid4()
+    exec_id_4 = uuid.uuid4()
+
+    support_wf = workflow_ids[0]
+    research_wf = workflow_ids[1]
+    report_wf = workflow_ids[2]
 
     executions = [
         {
             "id": exec_id_1,
+            "workflow_id": support_wf,
             "org_id": org_id,
-            "status": "waiting_approval",
-            "input": {"task": "Security audit"},
-            "output": None,
+            "status": "completed",
+            "input": {"ticket": "Customer cannot access billing portal"},
+            "output": {"summary": "Resolved by refreshing account permissions"},
             "error": None,
-            "total_tokens": 1240,
-            "estimated_cost": Decimal("0"),
+            "started_at": now - timedelta(days=3, minutes=8),
+            "completed_at": now - timedelta(days=3),
+            "total_tokens": 3120,
+            "estimated_cost": Decimal("0.00000000"),
             "triggered_by": user_id,
         },
         {
             "id": exec_id_2,
+            "workflow_id": research_wf,
+            "org_id": org_id,
+            "status": "completed",
+            "input": {"topic": "AI procurement risk controls"},
+            "output": {"summary": "Generated a sourced research brief"},
+            "error": None,
+            "started_at": now - timedelta(days=2, minutes=11),
+            "completed_at": now - timedelta(days=2),
+            "total_tokens": 4680,
+            "estimated_cost": Decimal("0.00000000"),
+            "triggered_by": user_id,
+        },
+        {
+            "id": exec_id_3,
+            "workflow_id": report_wf,
+            "org_id": org_id,
+            "status": "failed",
+            "input": {"report": "Weekly executive summary"},
+            "output": None,
+            "error": "Metrics API returned a 503 response",
+            "started_at": now - timedelta(days=1, minutes=5),
+            "completed_at": now - timedelta(days=1),
+            "total_tokens": 1420,
+            "estimated_cost": Decimal("0.00000000"),
+            "triggered_by": user_id,
+        },
+        {
+            "id": exec_id_4,
+            "workflow_id": report_wf,
             "org_id": org_id,
             "status": "waiting_approval",
             "input": {"task": "Batch email report"},
             "output": None,
             "error": None,
+            "started_at": now - timedelta(hours=4),
+            "completed_at": None,
             "total_tokens": 890,
-            "estimated_cost": Decimal("0"),
+            "estimated_cost": Decimal("0.00000000"),
             "triggered_by": user_id,
         },
     ]
@@ -335,7 +381,7 @@ def _demo_executions_and_approvals(
     approvals = [
         {
             "id": uuid.uuid4(),
-            "execution_id": exec_id_1,
+            "execution_id": exec_id_4,
             "node_id": "approval-security",
             "status": "pending",
             "request_data": {
@@ -352,7 +398,7 @@ def _demo_executions_and_approvals(
         },
         {
             "id": uuid.uuid4(),
-            "execution_id": exec_id_2,
+            "execution_id": exec_id_4,
             "node_id": "approval-batch",
             "status": "pending",
             "request_data": {
@@ -369,7 +415,70 @@ def _demo_executions_and_approvals(
         },
     ]
 
-    return executions, approvals
+    events = [
+        {
+            "id": uuid.uuid4(),
+            "org_id": org_id,
+            "event_type": "agent.run",
+            "workflow_id": support_wf,
+            "execution_id": exec_id_1,
+            "agent_type": "supervisor",
+            "model": "google/gemma-3-27b-it:free",
+            "tokens_input": 1250,
+            "tokens_output": 1870,
+            "cost_estimate": Decimal("0.00000000"),
+            "latency_ms": 1840,
+            "success": True,
+            "event_metadata": {"demo": True},
+        },
+        {
+            "id": uuid.uuid4(),
+            "org_id": org_id,
+            "event_type": "agent.run",
+            "workflow_id": research_wf,
+            "execution_id": exec_id_2,
+            "agent_type": "research",
+            "model": "meta-llama/llama-3.3-70b-instruct:free",
+            "tokens_input": 2110,
+            "tokens_output": 2570,
+            "cost_estimate": Decimal("0.00000000"),
+            "latency_ms": 3260,
+            "success": True,
+            "event_metadata": {"demo": True},
+        },
+        {
+            "id": uuid.uuid4(),
+            "org_id": org_id,
+            "event_type": "agent.run",
+            "workflow_id": report_wf,
+            "execution_id": exec_id_3,
+            "agent_type": "research",
+            "model": "qwen/qwen3-235b-a22b:free",
+            "tokens_input": 780,
+            "tokens_output": 640,
+            "cost_estimate": Decimal("0.00000000"),
+            "latency_ms": 2140,
+            "success": False,
+            "event_metadata": {"demo": True, "error": "Metrics API returned a 503 response"},
+        },
+        {
+            "id": uuid.uuid4(),
+            "org_id": org_id,
+            "event_type": "agent.run",
+            "workflow_id": report_wf,
+            "execution_id": exec_id_4,
+            "agent_type": "executor",
+            "model": "deepseek/deepseek-r1:free",
+            "tokens_input": 420,
+            "tokens_output": 470,
+            "cost_estimate": Decimal("0.00000000"),
+            "latency_ms": 990,
+            "success": True,
+            "event_metadata": {"demo": True, "state": "waiting_approval"},
+        },
+    ]
+
+    return executions, approvals, events
 
 
 # ---------------------------------------------------------------------------
@@ -386,7 +495,10 @@ async def seed_demo_data(
     authenticated user's organisation. Safe to call multiple times — skips
     seeding if data already exists.
     """
-    org_id = current_user.org_id
+    if not current_user.org_id:
+        raise HTTPException(status_code=403, detail="No organization membership found")
+
+    org_id = uuid.UUID(str(current_user.org_id))
 
     # --- Guard: skip if any workflows exist ---
     existing = await db.execute(
@@ -400,9 +512,10 @@ async def seed_demo_data(
     summary: dict[str, int] = {}
 
     # --- Workflows ---
-    for w in _demo_workflows(org_id, user_id):
+    workflows = _demo_workflows(org_id, user_id)
+    for w in workflows:
         db.add(Workflow(**w))
-    summary["workflows"] = 3
+    summary["workflows"] = len(workflows)
 
     # --- Agents ---
     for a in _demo_agents(org_id, user_id):
@@ -420,16 +533,17 @@ async def seed_demo_data(
     summary["memories"] = 5
 
     # --- Executions + Approvals ---
-    from app.models.models import HumanApproval
-    executions, approvals = _demo_executions_and_approvals(org_id, user_id)
-    exec_objs = []
+    workflow_ids = [w["id"] for w in workflows]
+    executions, approvals, events = _demo_activity(org_id, user_id, workflow_ids)
     for e in executions:
-        obj = WorkflowExecution(**e)
-        db.add(obj)
-        exec_objs.append(obj)
+        db.add(WorkflowExecution(**e))
     for ap in approvals:
         db.add(HumanApproval(**ap))
-    summary["approvals"] = 2
+    for event in events:
+        db.add(AnalyticsEvent(**event))
+    summary["executions"] = len(executions)
+    summary["approvals"] = len(approvals)
+    summary["analytics_events"] = len(events)
 
     await db.commit()
     return {"seeded": True, "summary": summary}
