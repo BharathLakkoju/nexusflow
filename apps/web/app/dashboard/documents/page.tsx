@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { documentsApi, type Document } from "@/lib/api";
+import { DEMO_DOCUMENTS } from "@/lib/demo-data";
 import { formatDate, truncate } from "@/lib/utils";
 
 const STATUS_CONFIG: Record<
@@ -49,7 +50,7 @@ export default function DocumentsPage() {
     if (!t?.accessToken) return;
     setToken(t.accessToken);
     const list = await documentsApi.list(t.accessToken);
-    setDocs(list);
+    setDocs(list.length > 0 ? list : DEMO_DOCUMENTS);
     setLoading(false);
   };
 
@@ -101,8 +102,12 @@ export default function DocumentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Knowledge Base</h1>
-          <p className="text-slate-400 text-sm mt-1">{docs.length} documents</p>
+          <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+            Knowledge Base
+          </h1>
+          <p className="text-brown-500 text-sm mt-1">
+            {docs.length} document{docs.length !== 1 ? "s" : ""}
+          </p>
         </div>
         <div>
           <input
@@ -115,7 +120,7 @@ export default function DocumentsPage() {
           <Button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="bg-purple-600 hover:bg-purple-700 gap-2"
+            className="bg-brown-700 hover:bg-brown-800 text-brown-50 gap-2"
           >
             {uploading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -127,7 +132,7 @@ export default function DocumentsPage() {
         </div>
       </div>
 
-      <div className="text-xs text-slate-500 bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+      <div className="text-xs text-brown-500 bg-brown-100 border border-brown-200 rounded-lg p-3">
         Supported: PDF, DOCX, TXT, MD, HTML, CSV · Files are stored on Vercel
         Blob and indexed for semantic search
       </div>
@@ -137,15 +142,15 @@ export default function DocumentsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-20 bg-slate-800 animate-pulse rounded-lg"
+              className="h-20 bg-brown-200 animate-pulse rounded-lg"
             />
           ))}
         </div>
       ) : docs.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardContent className="p-12 text-center">
-            <FileText className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400">
+            <FileText className="h-12 w-12 text-brown-300 mx-auto mb-4" />
+            <p className="text-brown-500">
               No documents yet. Upload files to build your knowledge base.
             </p>
           </CardContent>
@@ -155,13 +160,13 @@ export default function DocumentsPage() {
           {docs.map((doc) => {
             const cfg = STATUS_CONFIG[doc.status] ?? STATUS_CONFIG.pending;
             return (
-              <Card key={doc.id} className="bg-slate-900 border-slate-800">
+              <Card key={doc.id} className="bg-brown-100 border-brown-200">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-blue-400 shrink-0" />
+                      <FileText className="h-5 w-5 text-brown-600 shrink-0" />
                       <div>
-                        <p className="font-medium text-white">
+                        <p className="font-medium text-brown-900">
                           {truncate(doc.name, 50)}
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -176,11 +181,11 @@ export default function DocumentsPage() {
                           </div>
                           {doc.chunk_count !== undefined &&
                             doc.chunk_count > 0 && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-xs text-brown-400">
                                 {doc.chunk_count} chunks
                               </span>
                             )}
-                          <span className="text-xs text-slate-600">
+                          <span className="text-xs text-brown-400">
                             {formatDate(doc.created_at)}
                           </span>
                         </div>

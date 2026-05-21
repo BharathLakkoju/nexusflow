@@ -47,9 +47,9 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 60
     RATE_LIMIT_PER_HOUR: int = 1000
 
-    # LLM defaults
-    DEFAULT_MODEL: str = "openai/gpt-4o-mini"
-    DEFAULT_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    # LLM defaults — free OpenRouter models only
+    DEFAULT_MODEL: str = "meta-llama/llama-3.3-70b-instruct:free"
+    DEFAULT_EMBEDDING_MODEL: str = "text-embedding-3-small"  # used via OpenRouter
 
     @property
     def async_database_url(self) -> str:

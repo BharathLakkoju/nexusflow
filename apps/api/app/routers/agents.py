@@ -35,7 +35,7 @@ async def create_agent(
         name=body.name,
         description=body.description,
         agent_type=body.agent_type,
-        model=body.model or "openai/gpt-4o-mini",
+        model=body.model or "meta-llama/llama-3.3-70b-instruct:free",
         system_prompt=body.system_prompt,
         tools=body.tools or [],
         agent_types=body.agent_types or ["executor"],

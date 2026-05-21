@@ -19,15 +19,16 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { analyticsApi, type AnalyticsDashboard } from "@/lib/api";
+import { DEMO_ANALYTICS } from "@/lib/demo-data";
 import { formatCost, formatTokens } from "@/lib/utils";
 
 const COLORS = [
-  "#8b5cf6",
-  "#3b82f6",
-  "#22c55e",
-  "#f59e0b",
-  "#ef4444",
-  "#06b6d4",
+  "#9a6848",
+  "#7d5038",
+  "#6b4226",
+  "#b8906a",
+  "#d4b896",
+  "#4a2c1c",
 ];
 
 export default function AnalyticsPage() {
@@ -42,7 +43,9 @@ export default function AnalyticsPage() {
       try {
         const dash = await analyticsApi.dashboard(30, t.accessToken);
         setData(dash);
-      } catch {}
+      } catch {
+        setData(DEMO_ANALYTICS);
+      }
       setLoading(false);
     };
     if (user) load();
@@ -51,12 +54,12 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-32 bg-slate-800 animate-pulse rounded" />
+        <div className="h-8 w-32 bg-brown-200 animate-pulse rounded" />
         <div className="grid grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-64 bg-slate-800 animate-pulse rounded-lg"
+              className="h-64 bg-brown-200 animate-pulse rounded-lg"
             />
           ))}
         </div>
@@ -67,15 +70,17 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <p className="text-slate-400 text-sm mt-1">Last 30 days</p>
+        <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+          Analytics
+        </h1>
+        <p className="text-brown-500 text-sm mt-1">Last 30 days</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Executions over time */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardHeader>
-            <CardTitle className="text-sm text-white">
+            <CardTitle className="text-sm text-brown-900">
               Executions Over Time
             </CardTitle>
           </CardHeader>
@@ -84,28 +89,28 @@ export default function AnalyticsPage() {
               <AreaChart data={data?.executions_by_day ?? []}>
                 <defs>
                   <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#9a6848" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#9a6848" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 10 }} />
-                <YAxis tick={{ fill: "#64748b", fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8d5c0" />
+                <XAxis dataKey="day" tick={{ fill: "#9a6848", fontSize: 10 }} />
+                <YAxis tick={{ fill: "#9a6848", fontSize: 10 }} />
                 <Tooltip
                   contentStyle={{
-                    background: "#0f172a",
-                    border: "1px solid #1e293b",
+                    background: "#faf6f1",
+                    border: "1px solid #e8d5c0",
                   }}
                 />
                 <Legend />
                 <Area
                   type="monotone"
                   dataKey="total"
-                  stroke="#8b5cf6"
+                  stroke="#9a6848"
                   fill="url(#g1)"
                   strokeWidth={2}
                   name="Total"
@@ -124,36 +129,38 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Cost by day */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardHeader>
-            <CardTitle className="text-sm text-white">Cost Over Time</CardTitle>
+            <CardTitle className="text-sm text-brown-900">
+              Cost Over Time
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={data?.cost_by_day ?? []}>
                 <defs>
                   <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#7d5038" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#7d5038" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" tick={{ fill: "#64748b", fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8d5c0" />
+                <XAxis dataKey="day" tick={{ fill: "#9a6848", fontSize: 10 }} />
                 <YAxis
-                  tick={{ fill: "#64748b", fontSize: 10 }}
+                  tick={{ fill: "#9a6848", fontSize: 10 }}
                   tickFormatter={(v) => `$${v.toFixed(3)}`}
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "#0f172a",
-                    border: "1px solid #1e293b",
+                    background: "#faf6f1",
+                    border: "1px solid #e8d5c0",
                   }}
                   formatter={(v) => [formatCost(Number(v)), "Cost"]}
                 />
                 <Area
                   type="monotone"
                   dataKey="cost"
-                  stroke="#f59e0b"
+                  stroke="#7d5038"
                   fill="url(#g3)"
                   strokeWidth={2}
                   name="Cost"
@@ -164,29 +171,29 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Tokens by model */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardHeader>
-            <CardTitle className="text-sm text-white">
+            <CardTitle className="text-sm text-brown-900">
               Token Usage by Model
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={data?.token_usage_by_model ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8d5c0" />
                 <XAxis
                   dataKey="model"
-                  tick={{ fill: "#64748b", fontSize: 10 }}
+                  tick={{ fill: "#9a6848", fontSize: 10 }}
                   tickFormatter={(v: string) => v.split("/")[1] ?? v}
                 />
                 <YAxis
-                  tick={{ fill: "#64748b", fontSize: 10 }}
+                  tick={{ fill: "#9a6848", fontSize: 10 }}
                   tickFormatter={(v) => formatTokens(v)}
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "#0f172a",
-                    border: "1px solid #1e293b",
+                    background: "#faf6f1",
+                    border: "1px solid #e8d5c0",
                   }}
                   formatter={(v) => [formatTokens(Number(v)), "Tokens"]}
                 />
@@ -201,9 +208,9 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Agent performance pie */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardHeader>
-            <CardTitle className="text-sm text-white">
+            <CardTitle className="text-sm text-brown-900">
               Agent Performance
             </CardTitle>
           </CardHeader>
@@ -231,8 +238,8 @@ export default function AnalyticsPage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: "#0f172a",
-                    border: "1px solid #1e293b",
+                    background: "#faf6f1",
+                    border: "1px solid #e8d5c0",
                   }}
                 />
               </PieChart>

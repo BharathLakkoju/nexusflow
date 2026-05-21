@@ -209,7 +209,7 @@ class Agent(Base):
     type = Column(String(50), nullable=False)
     description = Column(Text)
     system_prompt = Column(Text)
-    model = Column(String(255), default="openai/gpt-4o-mini", nullable=False)
+    model = Column(String(255), default="meta-llama/llama-3.3-70b-instruct:free", nullable=False)
     temperature = Column(Numeric(3, 2), default=Decimal("0.70"))
     max_tokens = Column(Integer, default=2000)
     tools = Column(JSONB, default=list)  # list of tool names/IDs

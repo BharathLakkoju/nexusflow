@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { workflowsApi, type Workflow } from "@/lib/api";
+import { DEMO_WORKFLOWS } from "@/lib/demo-data";
 import { formatDate } from "@/lib/utils";
 
 const STATUS_ICON: Record<string, React.ReactNode> = {
@@ -42,7 +43,7 @@ export default function WorkflowsPage() {
       const token = await user?.getAuthJson();
       if (!token?.accessToken) return;
       const list = await workflowsApi.list(token.accessToken);
-      setWorkflows(list);
+      setWorkflows(list.length > 0 ? list : DEMO_WORKFLOWS);
     } catch {
     } finally {
       setLoading(false);
@@ -87,13 +88,15 @@ export default function WorkflowsPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Workflows</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            {workflows.length} workflows
+          <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+            Workflows
+          </h1>
+          <p className="text-brown-500 text-sm mt-1">
+            {workflows.length} workflow{workflows.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Link href="/dashboard/workflows/new">
-          <Button className="bg-purple-600 hover:bg-purple-700 gap-2">
+          <Button className="bg-brown-700 hover:bg-brown-800 text-brown-50 gap-2">
             <Plus className="h-4 w-4" /> New Workflow
           </Button>
         </Link>
@@ -103,7 +106,7 @@ export default function WorkflowsPage() {
         placeholder="Search workflows..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="bg-slate-900 border-slate-700 text-white max-w-sm"
+        className="bg-brown-100 border-brown-200 text-brown-900 placeholder:text-brown-400 max-w-sm"
       />
 
       {loading ? (
@@ -111,19 +114,19 @@ export default function WorkflowsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 bg-slate-800 animate-pulse rounded-lg"
+              className="h-24 bg-brown-200 animate-pulse rounded-lg"
             />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardContent className="p-12 text-center">
-            <GitBranch className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400 mb-4">
+            <GitBranch className="h-12 w-12 text-brown-300 mx-auto mb-4" />
+            <p className="text-brown-500 mb-4">
               No workflows yet. Build your first AI workflow!
             </p>
             <Link href="/dashboard/workflows/new">
-              <Button className="bg-purple-600 hover:bg-purple-700">
+              <Button className="bg-brown-700 hover:bg-brown-800 text-brown-50">
                 <Plus className="h-4 w-4 mr-2" /> Create Workflow
               </Button>
             </Link>
@@ -134,27 +137,27 @@ export default function WorkflowsPage() {
           {filtered.map((wf) => (
             <Card
               key={wf.id}
-              className="bg-slate-900 border-slate-800 hover:border-slate-700 transition-colors"
+              className="bg-brown-100 border-brown-200 hover:border-brown-300 transition-colors"
             >
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <GitBranch className="h-5 w-5 text-purple-400 shrink-0" />
+                    <GitBranch className="h-5 w-5 text-brown-600 shrink-0" />
                     <div>
-                      <p className="font-medium text-white">{wf.name}</p>
+                      <p className="font-medium text-brown-900">{wf.name}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="flex items-center gap-1">
                           {STATUS_ICON[wf.status] ?? null}
-                          <span className="text-xs text-slate-400 capitalize">
+                          <span className="text-xs text-brown-500 capitalize">
                             {wf.status}
                           </span>
                         </div>
-                        <span className="text-slate-700">·</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-brown-300">·</span>
+                        <span className="text-xs text-brown-400">
                           v{wf.version}
                         </span>
-                        <span className="text-slate-700">·</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-brown-300">·</span>
+                        <span className="text-xs text-brown-400">
                           {formatDate(wf.updated_at)}
                         </span>
                       </div>
@@ -178,7 +181,7 @@ export default function WorkflowsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-slate-400 hover:text-white"
+                        className="text-brown-500 hover:text-brown-900"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@/lib/auth/hooks";
 import { Brain, Trash2, Search, Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { DEMO_MEMORY } from "@/lib/demo-data";
 
 interface MemoryEntry {
   id: string;
@@ -46,9 +47,11 @@ export default function MemoryPage() {
     setToken(t.accessToken);
     try {
       const list = await apiFetch<MemoryEntry[]>("/memory", t.accessToken);
-      setMemories(list);
+      setMemories(
+        list.length > 0 ? list : (DEMO_MEMORY as unknown as MemoryEntry[]),
+      );
     } catch {
-      setMemories([]);
+      setMemories(DEMO_MEMORY as unknown as MemoryEntry[]);
     } finally {
       setLoading(false);
     }

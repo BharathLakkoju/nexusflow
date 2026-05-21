@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { agentsApi, type Agent } from "@/lib/api";
+import { DEMO_AGENTS } from "@/lib/demo-data";
 import { useSSE } from "@/hooks/useSSE";
 import { formatDate } from "@/lib/utils";
 
@@ -40,14 +41,17 @@ function AgentRunModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
+    <div className="fixed inset-0 bg-brown-950/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-brown-900 border border-brown-700 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-brown-700">
           <div className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-purple-400" />
-            <h3 className="font-semibold text-white">{agent.name}</h3>
+            <Bot className="h-5 w-5 text-brown-400" />
+            <h3 className="font-semibold text-brown-100">{agent.name}</h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button
+            onClick={onClose}
+            className="text-brown-400 hover:text-brown-100"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -60,12 +64,12 @@ function AgentRunModal({
                 onChange={(e) => setTask(e.target.value)}
                 placeholder="Describe the task for this agent..."
                 rows={4}
-                className="bg-slate-800 border-slate-700 text-white"
+                className="bg-brown-800 border-brown-700 text-brown-100"
               />
               <Button
                 onClick={run}
                 disabled={running || !task.trim()}
-                className="bg-purple-600 hover:bg-purple-700 gap-2"
+                className="bg-brown-700 hover:bg-brown-600 text-brown-100 gap-2"
               >
                 {running ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -78,15 +82,15 @@ function AgentRunModal({
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-brown-300">
                   Execution: {executionId.slice(0, 12)}…
                 </p>
                 {!isDone && (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-400" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-brown-400" />
                 )}
                 {isDone && <Badge variant="success">Completed</Badge>}
               </div>
-              <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs space-y-1 max-h-64 overflow-y-auto">
+              <div className="bg-brown-950 rounded-lg p-3 font-mono text-xs space-y-1 max-h-64 overflow-y-auto">
                 {events.map((e, i) => (
                   <div
                     key={i}
@@ -95,17 +99,17 @@ function AgentRunModal({
                         ? "text-red-400"
                         : e.type === "completed"
                           ? "text-green-400"
-                          : "text-slate-300"
+                          : "text-brown-300"
                     }
                   >
-                    <span className="text-slate-600">[{e.type}]</span>{" "}
+                    <span className="text-brown-600">[{e.type}]</span>{" "}
                     {typeof e.data === "string"
                       ? e.data
                       : JSON.stringify(e.data)}
                   </div>
                 ))}
                 {events.length === 0 && (
-                  <p className="text-slate-600">Waiting for events…</p>
+                  <p className="text-brown-600">Waiting for events…</p>
                 )}
               </div>
             </div>
@@ -130,7 +134,7 @@ export default function AgentsPage() {
     if (!t?.accessToken) return;
     setToken(t.accessToken);
     const list = await agentsApi.list(t.accessToken);
-    setAgents(list);
+    setAgents(list.length > 0 ? list : DEMO_AGENTS);
     setLoading(false);
   };
 
@@ -146,7 +150,7 @@ export default function AgentsPage() {
         {
           name: newName,
           agent_type: "research",
-          model: "openai/gpt-4o-mini",
+          model: "meta-llama/llama-3.3-70b-instruct:free",
           system_prompt: "You are a helpful AI assistant.",
         },
         token,
@@ -170,8 +174,12 @@ export default function AgentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Agents</h1>
-          <p className="text-slate-400 text-sm mt-1">{agents.length} agents</p>
+          <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+            Agents
+          </h1>
+          <p className="text-brown-500 text-sm mt-1">
+            {agents.length} agent{agents.length !== 1 ? "s" : ""}
+          </p>
         </div>
       </div>
 
@@ -181,13 +189,13 @@ export default function AgentsPage() {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="New agent name..."
-          className="bg-slate-900 border-slate-700 text-white"
+          className="bg-brown-100 border-brown-200 text-brown-900 placeholder:text-brown-400"
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}
         />
         <Button
           onClick={handleCreate}
           disabled={creating || !newName.trim()}
-          className="bg-purple-600 hover:bg-purple-700 gap-2 shrink-0"
+          className="bg-brown-700 hover:bg-brown-800 text-brown-50 gap-2 shrink-0"
         >
           {creating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -203,15 +211,15 @@ export default function AgentsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-20 bg-slate-800 animate-pulse rounded-lg"
+              className="h-20 bg-brown-200 animate-pulse rounded-lg"
             />
           ))}
         </div>
       ) : agents.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardContent className="p-12 text-center">
-            <Bot className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400">
+            <Bot className="h-12 w-12 text-brown-300 mx-auto mb-4" />
+            <p className="text-brown-500">
               No agents yet. Create your first AI agent!
             </p>
           </CardContent>
@@ -221,22 +229,22 @@ export default function AgentsPage() {
           {agents.map((a) => (
             <Card
               key={a.id}
-              className="bg-slate-900 border-slate-800 hover:border-slate-700 transition-colors"
+              className="bg-brown-100 border-brown-200 hover:border-brown-300 transition-colors"
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Bot className="h-5 w-5 text-purple-400" />
+                    <Bot className="h-5 w-5 text-brown-600" />
                     <div>
-                      <p className="font-medium text-white">{a.name}</p>
+                      <p className="font-medium text-brown-900">{a.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Badge variant="secondary" className="text-[10px]">
                           {a.agent_type}
                         </Badge>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-brown-500">
                           {a.model.split("/")[1]}
                         </span>
-                        <span className="text-xs text-slate-600">
+                        <span className="text-xs text-brown-400">
                           {formatDate(a.updated_at)}
                         </span>
                       </div>
@@ -246,7 +254,7 @@ export default function AgentsPage() {
                     <Button
                       size="sm"
                       onClick={() => setRunTarget(a)}
-                      className="bg-green-600 hover:bg-green-700 gap-1"
+                      className="bg-green-700 hover:bg-green-600 gap-1"
                     >
                       <Play className="h-3.5 w-3.5" /> Run
                     </Button>

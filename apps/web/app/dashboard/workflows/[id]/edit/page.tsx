@@ -22,18 +22,21 @@ function SSEConsole({
   const { events, isConnected, isDone } = useSSE(executionId, token);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 bg-slate-900 border-t border-slate-800 z-50 h-64 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800">
+    <div className="fixed inset-x-0 bottom-0 bg-brown-900 border-t border-brown-800 z-50 h-64 flex flex-col">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-brown-800">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white">
+          <span className="text-sm font-medium text-brown-100">
             Execution: {executionId.slice(0, 8)}…
           </span>
           {!isDone && isConnected && (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-400" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-brown-400" />
           )}
           {isDone && <Badge variant="success">Done</Badge>}
         </div>
-        <button onClick={onClose} className="text-slate-400 hover:text-white">
+        <button
+          onClick={onClose}
+          className="text-brown-400 hover:text-brown-100"
+        >
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -41,19 +44,19 @@ function SSEConsole({
         {events.map((e, i) => (
           <div
             key={i}
-            className={`flex gap-2 ${e.type === "error" ? "text-red-400" : e.type === "completed" ? "text-green-400" : "text-slate-300"}`}
+            className={`flex gap-2 ${e.type === "error" ? "text-red-400" : e.type === "completed" ? "text-green-400" : "text-brown-300"}`}
           >
-            <span className="text-slate-600 shrink-0">
+            <span className="text-brown-600 shrink-0">
               {new Date(e.timestamp ?? "").toLocaleTimeString()}
             </span>
-            <span className="text-slate-500 shrink-0">[{e.type}]</span>
+            <span className="text-brown-500 shrink-0">[{e.type}]</span>
             <span className="break-all">
               {typeof e.data === "string" ? e.data : JSON.stringify(e.data)}
             </span>
           </div>
         ))}
         {events.length === 0 && (
-          <p className="text-slate-600">Waiting for events…</p>
+          <p className="text-brown-600">Waiting for events…</p>
         )}
       </div>
     </div>

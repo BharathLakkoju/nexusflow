@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { approvalsApi, type HumanApproval } from "@/lib/api";
+import { DEMO_APPROVALS } from "@/lib/demo-data";
 import { formatDate, truncate } from "@/lib/utils";
 
 export default function ApprovalsPage() {
@@ -21,7 +22,7 @@ export default function ApprovalsPage() {
     if (!t?.accessToken) return;
     setToken(t.accessToken);
     const list = await approvalsApi.list(t.accessToken);
-    setApprovals(list);
+    setApprovals(list.length > 0 ? list : DEMO_APPROVALS);
     setLoading(false);
   };
 
@@ -44,8 +45,10 @@ export default function ApprovalsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Human Approvals</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+          Human Approvals
+        </h1>
+        <p className="text-brown-500 text-sm mt-1">
           {approvals.length} pending approval{approvals.length !== 1 ? "s" : ""}
         </p>
       </div>
@@ -55,15 +58,15 @@ export default function ApprovalsPage() {
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-32 bg-slate-800 animate-pulse rounded-lg"
+              className="h-32 bg-brown-200 animate-pulse rounded-lg"
             />
           ))}
         </div>
       ) : approvals.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-brown-100 border-brown-200">
           <CardContent className="p-12 text-center">
             <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <p className="text-slate-400">
+            <p className="text-brown-500">
               All caught up! No pending approvals.
             </p>
           </CardContent>
@@ -73,7 +76,7 @@ export default function ApprovalsPage() {
           {approvals.map((approval) => (
             <Card
               key={approval.id}
-              className="bg-slate-900 border-slate-800 border-l-4 border-l-yellow-500"
+              className="bg-brown-100 border-brown-200 border-l-4 border-l-yellow-500"
             >
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-4">
@@ -86,15 +89,15 @@ export default function ApprovalsPage() {
                       >
                         Pending
                       </Badge>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-brown-400">
                         {formatDate(approval.created_at)}
                       </span>
                     </div>
-                    <p className="text-white font-medium mb-1">
+                    <p className="text-brown-900 font-medium mb-1">
                       {truncate(approval.message || "Review required", 100)}
                     </p>
                     {approval.execution_id && (
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-brown-500">
                         Execution:{" "}
                         <span className="font-mono">
                           {approval.execution_id.slice(0, 16)}…
@@ -102,7 +105,7 @@ export default function ApprovalsPage() {
                       </p>
                     )}
                     {approval.context != null && (
-                      <pre className="text-xs text-slate-400 bg-slate-950 rounded p-2 mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap">
+                      <pre className="text-xs text-brown-600 bg-brown-200/60 rounded p-2 mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap">
                         {typeof approval.context === "string"
                           ? approval.context
                           : JSON.stringify(approval.context as object, null, 2)}
@@ -114,7 +117,7 @@ export default function ApprovalsPage() {
                       size="sm"
                       onClick={() => handleAction(approval.id, "approved")}
                       disabled={acting === approval.id}
-                      className="bg-green-600 hover:bg-green-700 gap-1"
+                      className="bg-green-700 hover:bg-green-600 gap-1"
                     >
                       {acting === approval.id ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />

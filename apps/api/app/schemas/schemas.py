@@ -261,7 +261,7 @@ class AgentCreate(BaseModel):
     type: str = Field(..., pattern="^(research|planner|executor|critic|memory|supervisor|custom)$")
     description: Optional[str] = None
     system_prompt: Optional[str] = None
-    model: str = Field(default="openai/gpt-4o-mini")
+    model: str = Field(default="meta-llama/llama-3.3-70b-instruct:free")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     max_tokens: int = Field(default=2000, ge=100, le=32000)
     tools: list[str] = Field(default_factory=list)
@@ -484,7 +484,7 @@ class ApprovalAction(BaseModel):
 class PromptRunRequest(BaseModel):
     system_prompt: str = Field(..., max_length=10000)
     user_message: str = Field(..., min_length=1, max_length=10000)
-    model: str = Field(default="openai/gpt-4o-mini")
+    model: str = Field(default="meta-llama/llama-3.3-70b-instruct:free")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     max_tokens: int = Field(default=2000, ge=100, le=32000)
     stream: bool = True

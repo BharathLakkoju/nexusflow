@@ -10,12 +10,12 @@ import { promptStudioApi } from "@/lib/api";
 import { formatCost, formatTokens } from "@/lib/utils";
 
 const MODELS = [
-  "openai/gpt-4o-mini",
-  "openai/gpt-4o",
-  "anthropic/claude-3.5-sonnet",
-  "anthropic/claude-3-haiku",
-  "google/gemini-2.0-flash",
-  "meta-llama/llama-3.1-8b-instruct",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemma-3-27b-it:free",
+  "deepseek/deepseek-r1:free",
+  "qwen/qwen3-235b-a22b:free",
+  "mistralai/mistral-7b-instruct:free",
+  "meta-llama/llama-3.1-8b-instruct:free",
 ];
 
 interface RunResult {
@@ -33,7 +33,7 @@ interface RunResult {
 
 export default function PromptStudioPage() {
   const user = useUser();
-  const [model, setModel] = useState("openai/gpt-4o-mini");
+  const [model, setModel] = useState("meta-llama/llama-3.3-70b-instruct:free");
   const [systemPrompt, setSystemPrompt] = useState(
     "You are a helpful AI assistant.",
   );
@@ -76,8 +76,10 @@ export default function PromptStudioPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Prompt Studio</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-800 tracking-tighter text-brown-900">
+          Prompt Studio
+        </h1>
+        <p className="text-brown-500 text-sm mt-1">
           Test prompts with any model and optionally inject RAG context
         </p>
       </div>
@@ -87,11 +89,11 @@ export default function PromptStudioPage() {
         <div className="space-y-4">
           {/* Model selector */}
           <div>
-            <label className="text-sm text-slate-400 block mb-1.5">Model</label>
+            <label className="text-sm text-brown-600 block mb-1.5">Model</label>
             <select
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg text-white text-sm h-10 px-3"
+              className="w-full bg-brown-100 border border-brown-200 rounded-lg text-brown-900 text-sm h-10 px-3"
             >
               {MODELS.map((m) => (
                 <option key={m} value={m}>
@@ -103,20 +105,20 @@ export default function PromptStudioPage() {
 
           {/* System prompt */}
           <div>
-            <label className="text-sm text-slate-400 block mb-1.5">
+            <label className="text-sm text-brown-600 block mb-1.5">
               System Prompt
             </label>
             <Textarea
               value={systemPrompt}
               onChange={(e) => setSystemPrompt(e.target.value)}
               rows={3}
-              className="bg-slate-900 border-slate-700 text-white resize-none"
+              className="bg-brown-100 border-brown-200 text-brown-900 resize-none"
             />
           </div>
 
           {/* User prompt */}
           <div>
-            <label className="text-sm text-slate-400 block mb-1.5">
+            <label className="text-sm text-brown-600 block mb-1.5">
               User Prompt
             </label>
             <Textarea
@@ -124,22 +126,22 @@ export default function PromptStudioPage() {
               onChange={(e) => setUserPrompt(e.target.value)}
               rows={5}
               placeholder="Enter your prompt here..."
-              className="bg-slate-900 border-slate-700 text-white resize-none"
+              className="bg-brown-100 border-brown-200 text-brown-900 resize-none"
             />
           </div>
 
           {/* RAG toggle */}
-          <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-lg p-3">
-            <FileSearch className="h-4 w-4 text-cyan-400" />
+          <div className="flex items-center gap-3 bg-brown-100 border border-brown-200 rounded-lg p-3">
+            <FileSearch className="h-4 w-4 text-brown-600" />
             <div className="flex-1">
-              <p className="text-sm text-white">Inject RAG Context</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-brown-900">Inject RAG Context</p>
+              <p className="text-xs text-brown-500">
                 Search knowledge base and prepend results
               </p>
             </div>
             <button
               onClick={() => setUseRag((p) => !p)}
-              className={`relative w-10 h-5 rounded-full transition-colors ${useRag ? "bg-purple-600" : "bg-slate-700"}`}
+              className={`relative w-10 h-5 rounded-full transition-colors ${useRag ? "bg-brown-700" : "bg-brown-200"}`}
             >
               <span
                 className={`absolute top-0.5 left-0.5 h-4 w-4 bg-white rounded-full transition-transform ${useRag ? "translate-x-5" : ""}`}
@@ -149,14 +151,14 @@ export default function PromptStudioPage() {
 
           {useRag && (
             <div>
-              <label className="text-sm text-slate-400 block mb-1.5">
+              <label className="text-sm text-brown-600 block mb-1.5">
                 RAG Search Query (optional)
               </label>
               <Input
                 value={ragQuery}
                 onChange={(e) => setRagQuery(e.target.value)}
                 placeholder="Leave empty to use user prompt as query"
-                className="bg-slate-900 border-slate-700 text-white"
+                className="bg-brown-100 border-brown-200 text-brown-900"
               />
             </div>
           )}
@@ -164,7 +166,7 @@ export default function PromptStudioPage() {
           <Button
             onClick={run}
             disabled={running || !userPrompt.trim()}
-            className="w-full bg-purple-600 hover:bg-purple-700 gap-2"
+            className="w-full bg-brown-700 hover:bg-brown-800 text-brown-50 gap-2"
           >
             {running ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -177,10 +179,10 @@ export default function PromptStudioPage() {
 
         {/* Right: output */}
         <div className="space-y-4">
-          <label className="text-sm text-slate-400 block">Output</label>
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 min-h-[400px]">
+          <label className="text-sm text-brown-600 block">Output</label>
+          <div className="bg-brown-100 border border-brown-200 rounded-lg p-4 min-h-[400px]">
             {running && (
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-brown-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">Running…</span>
               </div>
@@ -188,37 +190,37 @@ export default function PromptStudioPage() {
             {result && (
               <div className="space-y-4">
                 <div className="prose prose-sm prose-invert max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm text-slate-200 font-sans">
+                  <pre className="whitespace-pre-wrap text-sm text-brown-800 font-sans">
                     {result.output}
                   </pre>
                 </div>
-                <div className="border-t border-slate-800 pt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
+                <div className="border-t border-brown-200 pt-3 grid grid-cols-2 gap-2 text-xs text-brown-500">
                   <div>
                     Model:{" "}
-                    <span className="text-slate-400">
+                    <span className="text-brown-700">
                       {result.model.split("/")[1]}
                     </span>
                   </div>
                   <div>
                     Tokens:{" "}
-                    <span className="text-slate-400">
+                    <span className="text-brown-700">
                       {formatTokens(result.usage?.total_tokens ?? 0)}
                     </span>
                   </div>
                   <div>
                     Cost:{" "}
-                    <span className="text-slate-400">
+                    <span className="text-brown-700">
                       {formatCost(result.cost_estimate)}
                     </span>
                   </div>
                   <div>
                     Latency:{" "}
-                    <span className="text-slate-400">
+                    <span className="text-brown-700">
                       {result.latency_ms}ms
                     </span>
                   </div>
                   {result.rag_context_used && (
-                    <div className="col-span-2 flex items-center gap-1 text-cyan-400">
+                    <div className="col-span-2 flex items-center gap-1 text-brown-600">
                       <FileSearch className="h-3 w-3" /> RAG context injected
                     </div>
                   )}
@@ -226,7 +228,7 @@ export default function PromptStudioPage() {
               </div>
             )}
             {!running && !result && (
-              <p className="text-slate-600 text-sm">
+              <p className="text-brown-400 text-sm">
                 Output will appear here after you run a prompt.
               </p>
             )}

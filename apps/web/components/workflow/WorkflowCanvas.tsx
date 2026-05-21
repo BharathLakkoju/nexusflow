@@ -122,14 +122,14 @@ function WorkflowNode({
 }) {
   const meta = NODE_TYPES_META.find((m) => m.type === data.nodeType);
   const Icon = meta?.icon ?? Zap;
-  const color = meta?.color ?? "#6366f1";
+  const color = meta?.color ?? "#b8906a";
 
   return (
     <div
-      className={`bg-slate-900 border-2 rounded-xl px-4 py-3 min-w-[140px] shadow-lg transition-all ${
+      className={`bg-brown-900 border-2 rounded-xl px-4 py-3 min-w-[140px] shadow-lg transition-all ${
         selected
-          ? "border-purple-400 shadow-purple-500/20 shadow-lg"
-          : "border-slate-700"
+          ? "border-brown-400 shadow-brown-500/20 shadow-lg"
+          : "border-brown-700"
       }`}
       style={{ borderColor: selected ? undefined : color + "66" }}
     >
@@ -141,11 +141,11 @@ function WorkflowNode({
           <Icon className="h-3.5 w-3.5" style={{ color }} />
         </div>
         <div>
-          <p className="text-xs font-semibold text-white">
+          <p className="text-xs font-semibold text-brown-100">
             {String(data.label ?? meta?.label ?? "Node")}
           </p>
           {data.model != null && (
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[10px] text-brown-500">
               {String(data.model).split("/")[1]}
             </p>
           )}
@@ -162,13 +162,15 @@ let nodeCounter = 0;
 // ---- NodePalette ----
 function NodePalette({ onAdd }: { onAdd: (type: string) => void }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1 w-44">
-      <p className="text-xs font-medium text-slate-400 mb-2 px-1">Add Node</p>
+    <div className="bg-brown-900 border border-brown-700 rounded-xl p-3 space-y-1 w-48 shadow-xl">
+      <p className="text-xs font-semibold text-brown-400 mb-2 px-1 uppercase tracking-widest">
+        Add Node
+      </p>
       {NODE_TYPES_META.map((m) => (
         <button
           key={m.type}
           onClick={() => onAdd(m.type)}
-          className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+          className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm text-brown-300 hover:bg-brown-800 hover:text-brown-100 transition-colors"
         >
           <m.icon className="h-3.5 w-3.5 shrink-0" style={{ color: m.color }} />
           {m.label}
@@ -192,55 +194,65 @@ function NodeEditor({
   const meta = NODE_TYPES_META.find((m) => m.type === data.nodeType);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 w-64 space-y-3">
+    <div className="bg-brown-900 border border-brown-700 rounded-xl p-4 w-64 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-white">
+        <p className="text-sm font-semibold text-brown-100">
           {meta?.label ?? "Node"} Settings
         </p>
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-white text-xs"
+          className="text-brown-400 hover:text-brown-100 text-xs"
         >
           ✕
         </button>
       </div>
 
       <div>
-        <label className="text-xs text-slate-400 block mb-1">Label</label>
+        <label className="text-xs text-brown-400 block mb-1">Label</label>
         <Input
           value={String(data.label ?? "")}
           onChange={(e) =>
             onChange(node.id, { ...data, label: e.target.value })
           }
-          className="bg-slate-800 border-slate-700 text-white h-8 text-sm"
+          className="bg-brown-800 border-brown-700 text-brown-100 h-8 text-sm"
         />
       </div>
 
       {data.nodeType === "agent" && (
         <>
           <div>
-            <label className="text-xs text-slate-400 block mb-1">Model</label>
+            <label className="text-xs text-brown-400 block mb-1">Model</label>
             <select
-              value={String(data.model ?? "openai/gpt-4o-mini")}
+              value={String(
+                data.model ?? "meta-llama/llama-3.3-70b-instruct:free",
+              )}
               onChange={(e) =>
                 onChange(node.id, { ...data, model: e.target.value })
               }
-              className="w-full bg-slate-800 border border-slate-700 rounded-md text-white text-sm h-8 px-2"
+              className="w-full bg-brown-800 border border-brown-700 rounded-md text-brown-100 text-sm h-8 px-2"
             >
-              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-              <option value="openai/gpt-4o">GPT-4o</option>
-              <option value="anthropic/claude-3.5-sonnet">
-                Claude 3.5 Sonnet
+              <option value="meta-llama/llama-3.3-70b-instruct:free">
+                Llama 3.3 70B (free)
               </option>
-              <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-              <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
-              <option value="meta-llama/llama-3.1-8b-instruct">
-                Llama 3.1 8B
+              <option value="google/gemma-3-27b-it:free">
+                Gemma 3 27B (free)
+              </option>
+              <option value="deepseek/deepseek-r1:free">
+                DeepSeek R1 (free)
+              </option>
+              <option value="qwen/qwen3-235b-a22b:free">
+                Qwen3 235B (free)
+              </option>
+              <option value="mistralai/mistral-7b-instruct:free">
+                Mistral 7B (free)
+              </option>
+              <option value="meta-llama/llama-3.1-8b-instruct:free">
+                Llama 3.1 8B (free)
               </option>
             </select>
           </div>
           <div>
-            <label className="text-xs text-slate-400 block mb-1">
+            <label className="text-xs text-brown-400 block mb-1">
               Prompt Template
             </label>
             <textarea
@@ -250,9 +262,9 @@ function NodeEditor({
               }
               placeholder="{{input}}"
               rows={3}
-              className="w-full bg-slate-800 border border-slate-700 rounded-md text-white text-sm p-2 resize-none"
+              className="w-full bg-brown-800 border border-brown-700 rounded-md text-brown-100 text-sm p-2 resize-none"
             />
-            <p className="text-[10px] text-slate-500 mt-1">
+            <p className="text-[10px] text-brown-500 mt-1">
               Use {"{{variable}}"} for context variables
             </p>
           </div>
@@ -261,13 +273,13 @@ function NodeEditor({
 
       {data.nodeType === "tool" && (
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Tool</label>
+          <label className="text-xs text-brown-400 block mb-1">Tool</label>
           <select
             value={String(data.toolName ?? "web_search")}
             onChange={(e) =>
               onChange(node.id, { ...data, toolName: e.target.value })
             }
-            className="w-full bg-slate-800 border border-slate-700 rounded-md text-white text-sm h-8 px-2"
+            className="w-full bg-brown-800 border border-brown-700 rounded-md text-brown-100 text-sm h-8 px-2"
           >
             <option value="web_search">Web Search</option>
             <option value="execute_python">Execute Python</option>
@@ -279,21 +291,21 @@ function NodeEditor({
 
       {data.nodeType === "conditional" && (
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Condition</label>
+          <label className="text-xs text-brown-400 block mb-1">Condition</label>
           <Input
             value={String(data.condition ?? "")}
             onChange={(e) =>
               onChange(node.id, { ...data, condition: e.target.value })
             }
             placeholder="{{output}} contains 'success'"
-            className="bg-slate-800 border-slate-700 text-white h-8 text-sm"
+            className="bg-brown-800 border-brown-700 text-brown-100 h-8 text-sm"
           />
         </div>
       )}
 
       {data.nodeType === "human_approval" && (
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Message</label>
+          <label className="text-xs text-brown-400 block mb-1">Message</label>
           <textarea
             value={String(data.message ?? "")}
             onChange={(e) =>
@@ -301,7 +313,7 @@ function NodeEditor({
             }
             placeholder="Please review the output..."
             rows={2}
-            className="w-full bg-slate-800 border border-slate-700 rounded-md text-white text-sm p-2 resize-none"
+            className="w-full bg-brown-800 border border-brown-700 rounded-md text-brown-100 text-sm p-2 resize-none"
           />
         </div>
       )}
@@ -354,7 +366,10 @@ export function WorkflowCanvas({
         data: {
           nodeType: type,
           label: meta?.label ?? type,
-          model: type === "agent" ? "openai/gpt-4o-mini" : undefined,
+          model:
+            type === "agent"
+              ? "meta-llama/llama-3.3-70b-instruct:free"
+              : undefined,
           prompt: type === "agent" ? "{{input}}" : undefined,
           toolName: type === "tool" ? "web_search" : undefined,
         },
@@ -387,12 +402,12 @@ export function WorkflowCanvas({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center gap-3 p-3 border-b border-slate-800 bg-slate-900/80 backdrop-blur shrink-0">
+      {/* Toolbar — z-[100] ensures the Add Node dropdown floats above the ReactFlow canvas */}
+      <div className="flex items-center gap-3 p-3 border-b border-brown-800 bg-brown-900 shrink-0 relative z-[100]">
         <Input
           value={workflowName}
           onChange={(e) => onNameChange(e.target.value)}
-          className="bg-slate-800 border-slate-700 text-white h-8 text-sm max-w-[240px]"
+          className="bg-brown-800 border-brown-700 text-brown-100 h-8 text-sm max-w-[240px]"
           placeholder="Workflow name..."
         />
         <div className="flex items-center gap-2 ml-auto">
@@ -400,13 +415,13 @@ export function WorkflowCanvas({
             <Button
               size="sm"
               variant="outline"
-              className="border-slate-700 text-slate-300 gap-1"
+              className="border-brown-600 text-brown-300 hover:bg-brown-800 hover:text-brown-100 gap-1"
               onClick={() => setShowPalette((p) => !p)}
             >
               <Plus className="h-4 w-4" /> Add Node
             </Button>
             {showPalette && (
-              <div className="absolute top-full mt-2 left-0 z-50">
+              <div className="absolute top-full mt-2 right-0 z-[200]">
                 <NodePalette onAdd={addNode} />
               </div>
             )}
@@ -416,7 +431,7 @@ export function WorkflowCanvas({
             <Button
               size="sm"
               variant="ghost"
-              className="text-red-400 hover:text-red-300 gap-1"
+              className="text-red-400 hover:text-red-300 hover:bg-red-950/30 gap-1"
               onClick={deleteSelected}
             >
               <Trash2 className="h-4 w-4" /> Delete
@@ -427,7 +442,7 @@ export function WorkflowCanvas({
             size="sm"
             onClick={() => onSave(nodes, edges)}
             disabled={saving}
-            className="bg-purple-600 hover:bg-purple-700 gap-1"
+            className="bg-brown-700 hover:bg-brown-600 text-brown-100 gap-1"
           >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -441,7 +456,7 @@ export function WorkflowCanvas({
             <Button
               size="sm"
               onClick={onExecute}
-              className="bg-green-600 hover:bg-green-700 gap-1"
+              className="bg-green-700 hover:bg-green-600 text-white gap-1"
             >
               <Play className="h-4 w-4" /> Run
             </Button>
@@ -460,23 +475,26 @@ export function WorkflowCanvas({
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             onNodeClick={(_, node) => setSelectedNode(node)}
-            onPaneClick={() => setSelectedNode(null)}
+            onPaneClick={() => {
+              setSelectedNode(null);
+              setShowPalette(false);
+            }}
             fitView
-            className="bg-slate-950"
+            className="bg-brown-950"
           >
             <Background
               variant={BackgroundVariant.Dots}
               gap={20}
               size={1}
-              color="#1e293b"
+              color="#4a2c1c"
             />
-            <Controls className="fill-slate-700" />
+            <Controls className="fill-brown-600" />
             <MiniMap
-              className="bg-slate-900 border border-slate-800"
-              nodeColor="#8b5cf6"
+              className="bg-brown-900 border border-brown-800"
+              nodeColor="#9a6848"
             />
             <Panel position="top-left">
-              <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+              <div className="flex items-center gap-2 text-xs text-brown-500 bg-brown-900/80 px-3 py-1.5 rounded-full border border-brown-800">
                 <span>{nodes.length} nodes</span>
                 <span>·</span>
                 <span>{edges.length} edges</span>
@@ -487,7 +505,7 @@ export function WorkflowCanvas({
 
         {/* Node editor panel */}
         {selectedNode && (
-          <div className="w-72 border-l border-slate-800 bg-slate-900/50 p-4 overflow-y-auto">
+          <div className="w-72 border-l border-brown-800 bg-brown-900/60 p-4 overflow-y-auto">
             <NodeEditor
               node={selectedNode}
               onChange={updateNodeData}
