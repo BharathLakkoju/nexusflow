@@ -34,7 +34,7 @@ async def create_document(
         file_type=body.file_type,
         file_size=body.file_size,
         status="pending",
-        uploaded_by=current_user.user_id,
+        created_by=current_user.user_id,
     )
     db.add(doc)
     await db.flush()

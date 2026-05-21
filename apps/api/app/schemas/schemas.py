@@ -315,6 +315,13 @@ class AgentRunResponse(BaseModel):
 # Documents & RAG
 # ---------------------------------------------------------------------------
 
+class DocumentCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=500)
+    file_type: str = Field(..., min_length=1, max_length=50)
+    file_url: str = Field(..., min_length=1, max_length=5000)
+    file_size: Optional[int] = Field(default=None, ge=0)
+
+
 class DocumentResponse(BaseModel):
     id: uuid.UUID
     name: str
