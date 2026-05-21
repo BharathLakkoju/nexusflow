@@ -34,8 +34,8 @@ class Settings(BaseSettings):
     # Tools
     TAVILY_API_KEY: str = ""
 
-    # Vercel Blob
-    VERCEL_BLOB_READ_WRITE_TOKEN: str = ""
+    # Vercel Blob (used by frontend upload route; backend reads public URLs only)
+    BLOB_READ_WRITE_TOKEN: str = ""
 
     # CORS / Frontend
     FRONTEND_URL: str = "http://localhost:3000"

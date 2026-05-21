@@ -25,7 +25,7 @@ services:
         sync: false
       - key: TAVILY_API_KEY
         sync: false
-      - key: VERCEL_BLOB_READ_WRITE_TOKEN
+      - key: BLOB_READ_WRITE_TOKEN
         sync: false
       - key: FRONTEND_URL
         sync: false

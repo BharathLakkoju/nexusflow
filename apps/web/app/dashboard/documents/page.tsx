@@ -11,7 +11,6 @@ import {
   Loader2,
   Clock,
 } from "lucide-react";
-import { put } from "@vercel/blob";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,8 +62,13 @@ export default function DocumentsPage() {
     if (!file) return;
     setUploading(true);
     try {
-      // Upload to Vercel Blob
-      const blob = await put(file.name, file, { access: "public" });
+      // Upload via server-side route (keeps BLOB_READ_WRITE_TOKEN secret)
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const blob = await res.json();
       // Register with API
       const doc = await documentsApi.create(
         {
