@@ -184,7 +184,7 @@ class ExecutionLog(Base):
     agent_type = Column(String(50))
     level = Column(String(20), default="info", nullable=False)
     message = Column(Text, nullable=False)
-    metadata = Column(JSONB, default=dict)
+    log_metadata = Column("metadata", JSONB, default=dict)
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     __table_args__ = (

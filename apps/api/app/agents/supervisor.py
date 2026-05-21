@@ -59,7 +59,6 @@ def create_supervisor(model: str, max_revisions: int = 2) -> callable:
 
     def supervisor_node(state: AgentState) -> AgentState:
         prompt = SUPERVISOR_SYSTEM_PROMPT.format(
-            max_revisions=state.get("max_revisions", max_revisions),
             task=state["task"][:500],
             has_plan=bool(state.get("plan")),
             has_research=bool(state.get("research")),

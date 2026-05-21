@@ -246,7 +246,7 @@ class ExecutionLogEntry(BaseModel):
     agent_type: Optional[str]
     level: str
     message: str
-    metadata: dict
+    log_metadata: dict
     timestamp: datetime
 
     model_config = {"from_attributes": True}
