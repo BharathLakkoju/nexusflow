@@ -86,18 +86,29 @@ Create free accounts at these websites first (keep the browser tabs open):
 
 1. Still on https://console.neon.tech, look in the left sidebar for **"Auth"**
 2. Click it, then click **"Enable Auth"** (or "Get Started")
-3. You'll see a page with your project settings. Find and copy these two things:
-   - **Project ID** — looks like `proj_abc123xyz`
-   - **Secret Server Key** — looks like `ssk_xxxxx`
-   - **Publishable Client Key** — looks like `pck_xxxxx`
-4. Still on the Auth page, scroll to **"OAuth Providers"** if you want Google login:
+3. Open **Auth → Configuration** and copy your **Auth URL**. It looks like:
+   ```
+   https://ep-xxx.neonauth.us-east-2.aws.neon.tech/neondb/auth
+   ```
+4. Generate a cookie secret for the Next.js app. Run this in your terminal:
+   ```bash
+   openssl rand -base64 32
+   ```
+   Save the output somewhere safe. You will use it later as `NEON_AUTH_COOKIE_SECRET`.
+5. Still on the Auth page, scroll to **"OAuth Providers"** if you want Google login:
    - Toggle Google ON
    - You'll need to create OAuth credentials at https://console.cloud.google.com (optional — email login works without this)
-5. Under **"Allowed Callback URLs"** add:
+6. After your Vercel site is live, come back and add your production frontend URL in **Auth → Configuration**:
+   - **Allowed origins / App URLs**:
    ```
-   https://your-app.vercel.app/api/auth/callback/stack
+   https://your-app.vercel.app
    ```
-   (You'll replace `your-app` with your real Vercel URL in Step 8 — come back and update this!)
+
+   - If you use Google or another OAuth provider, also add:
+   ```
+   https://your-app.vercel.app/auth/callback
+   ```
+   If you skip the production frontend origin, sign-up/sign-in requests fail with `INVALID_ORIGIN`.
 
 ✅ User login is configured!
 
@@ -177,18 +188,17 @@ Create free accounts at these websites first (keep the browser tabs open):
 
 Scroll down to **"Environment Variables"** and add each of these:
 
-| Variable Name                  | Value                                                |
-| ------------------------------ | ---------------------------------------------------- |
-| `DATABASE_URL`                 | Your Neon connection string from Step 2              |
-| `STACK_AUTH_PROJECT_ID`        | Your Stack Auth project ID from Step 3               |
-| `STACK_AUTH_SECRET_SERVER_KEY` | Your secret server key from Step 3                   |
-| `UPSTASH_REDIS_REST_URL`       | Your Upstash URL from Step 4                         |
-| `UPSTASH_REDIS_REST_TOKEN`     | Your Upstash token from Step 4                       |
-| `OPENROUTER_API_KEY`           | Your OpenRouter key from Step 6                      |
-| `INNGEST_EVENT_KEY`            | Your Inngest event key from Step 5                   |
-| `INNGEST_SIGNING_KEY`          | Your Inngest signing key from Step 5                 |
-| `FRONTEND_URL`                 | `https://your-app.vercel.app` (update after Step 8!) |
-| `SECRET_KEY`                   | A random 32-character string (generate below)        |
+| Variable Name              | Value                                                |
+| -------------------------- | ---------------------------------------------------- |
+| `DATABASE_URL`             | Your Neon connection string from Step 2              |
+| `NEON_AUTH_JWKS_URL`       | Your Auth URL from Step 3 + `/.well-known/jwks.json` |
+| `UPSTASH_REDIS_REST_URL`   | Your Upstash URL from Step 4                         |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash token from Step 4                       |
+| `OPENROUTER_API_KEY`       | Your OpenRouter key from Step 6                      |
+| `INNGEST_EVENT_KEY`        | Your Inngest event key from Step 5                   |
+| `INNGEST_SIGNING_KEY`      | Your Inngest signing key from Step 5                 |
+| `FRONTEND_URL`             | `https://your-app.vercel.app` (update after Step 8!) |
+| `SECRET_KEY`               | A random 32-character string (generate below)        |
 
 **To generate a SECRET_KEY**, run this in your terminal:
 
@@ -237,12 +247,12 @@ Copy the output and paste it as the `SECRET_KEY` value.
 
 Click **"Environment Variables"** and add:
 
-| Variable Name                              | Value                                       |
-| ------------------------------------------ | ------------------------------------------- |
-| `NEXT_PUBLIC_API_URL`                      | `https://nexusflow-api.onrender.com/api/v1` |
-| `NEXT_PUBLIC_STACK_PROJECT_ID`             | Your Stack Auth project ID from Step 3      |
-| `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` | Your publishable client key from Step 3     |
-| `BLOB_READ_WRITE_TOKEN`                    | See Step 8c below                           |
+| Variable Name             | Value                                       |
+| ------------------------- | ------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`     | `https://nexusflow-api.onrender.com/api/v1` |
+| `NEON_AUTH_BASE_URL`      | Your Auth URL from Step 3                   |
+| `NEON_AUTH_COOKIE_SECRET` | The secret you generated in Step 3          |
+| `BLOB_READ_WRITE_TOKEN`   | See Step 8c below                           |
 
 ### 8c. Set up Vercel Blob (file storage)
 
@@ -272,12 +282,16 @@ Now update a few settings with your real URLs:
 2. Update `FRONTEND_URL` to your actual Vercel URL (e.g., `https://nexusflow-abc.vercel.app`)
 3. Click **"Save Changes"** → Render will redeploy automatically
 
-### 9b. Update Neon Auth callback URL
+### 9b. Update Neon Auth production URLs
 
-1. Go back to https://console.neon.tech → **Auth** → **Settings**
-2. Add your real Vercel URL to **Allowed Callback URLs**:
+1. Go back to https://console.neon.tech → **Auth** → **Configuration**
+2. Add your real Vercel URL to **Allowed origins / App URLs**:
    ```
-   https://nexusflow-abc.vercel.app/api/auth/callback/stack
+   https://nexusflow-abc.vercel.app
+   ```
+3. If you enabled Google or another OAuth provider, also add:
+   ```
+   https://nexusflow-abc.vercel.app/auth/callback
    ```
 
 ### 9c. Register Inngest app
@@ -315,14 +329,15 @@ Render's free tier **sleeps after 15 minutes** of no traffic. The first request 
 
 ## 🔧 Troubleshooting
 
-| Problem                 | Fix                                                                                 |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| Backend returns 500     | Check Render logs → **Logs** tab                                                    |
-| Login doesn't work      | Check `NEXT_PUBLIC_STACK_PROJECT_ID` and `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` |
-| "CORS error" in browser | Make sure `FRONTEND_URL` in Render matches your exact Vercel URL                    |
-| Document upload fails   | Make sure Vercel Blob is connected and `BLOB_READ_WRITE_TOKEN` is set               |
-| AI agents don't respond | Check `OPENROUTER_API_KEY` is correct and has credits                               |
-| Database error          | Re-run `alembic upgrade head` in Render shell                                       |
+| Problem                             | Fix                                                                                           |
+| ----------------------------------- | --------------------------------------------------------------------------------------------- |
+| Backend returns 500                 | Check Render logs → **Logs** tab                                                              |
+| `INVALID_ORIGIN` on sign-up/sign-in | Add your exact Vercel URL in Neon → **Auth** → **Configuration** → Allowed origins / App URLs |
+| Login doesn't work                  | Check `NEON_AUTH_BASE_URL` and `NEON_AUTH_COOKIE_SECRET` in Vercel                            |
+| "CORS error" in browser             | Make sure `FRONTEND_URL` in Render matches your exact Vercel URL                              |
+| Document upload fails               | Make sure Vercel Blob is connected and `BLOB_READ_WRITE_TOKEN` is set                         |
+| AI agents don't respond             | Check `OPENROUTER_API_KEY` is correct and has credits                                         |
+| Database error                      | Re-run `alembic upgrade head` in Render shell                                                 |
 
 ---
 
