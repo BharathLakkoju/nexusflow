@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import { Zap, Send, Loader2, FileSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

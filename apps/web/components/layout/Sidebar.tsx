@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser, useStackApp } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
+import { authClient } from "@/lib/auth/client";
 import {
   Bot,
   BarChart3,
@@ -34,7 +35,6 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const user = useUser();
-  const app = useStackApp();
 
   return (
     <aside className="w-64 h-screen bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
@@ -91,7 +91,7 @@ export function Sidebar() {
           variant="ghost"
           size="sm"
           className="w-full justify-start gap-2 text-slate-400 hover:text-white"
-          onClick={() => app.signOut()}
+          onClick={() => authClient.signOut()}
         >
           <LogOut className="h-4 w-4" />
           Sign Out

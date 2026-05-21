@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import {
   AreaChart,
   Area,
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
                     background: "#0f172a",
                     border: "1px solid #1e293b",
                   }}
-                  formatter={(v: number) => [formatTokens(v), "Tokens"]}
+                  formatter={(v) => [formatTokens(Number(v)), "Tokens"]}
                 />
                 <Bar dataKey="tokens" radius={[4, 4, 0, 0]}>
                   {(data?.token_usage_by_model ?? []).map((_, i) => (
@@ -217,9 +217,13 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label={({ agent_type, percent }) =>
-                    `${agent_type} ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={(props) => {
+                    const agent_type = (
+                      props as unknown as Record<string, unknown>
+                    ).agent_type as string | undefined;
+                    const percent = props.percent ?? 0;
+                    return `${agent_type ?? ""} ${(percent * 100).toFixed(0)}%`;
+                  }}
                 >
                   {(data?.agent_performance ?? []).map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />

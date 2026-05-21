@@ -144,7 +144,7 @@ function WorkflowNode({
           <p className="text-xs font-semibold text-white">
             {String(data.label ?? meta?.label ?? "Node")}
           </p>
-          {data.model && (
+          {data.model != null && (
             <p className="text-[10px] text-slate-500">
               {String(data.model).split("/")[1]}
             </p>

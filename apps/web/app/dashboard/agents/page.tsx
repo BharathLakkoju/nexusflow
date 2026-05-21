@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import { Plus, Bot, Play, Edit, Trash2, Loader2, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

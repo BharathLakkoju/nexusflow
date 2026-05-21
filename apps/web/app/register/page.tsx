@@ -1,5 +1,5 @@
 "use client";
-import { SignUp } from "@stackframe/stack";
+import { AuthView } from "@neondatabase/auth-ui";
 
 export default function RegisterPage() {
   return (
@@ -11,7 +11,7 @@ export default function RegisterPage() {
           </h1>
           <p className="text-white/50">Start building AI workflows for free</p>
         </div>
-        <SignUp />
+        <AuthView pathname="sign-up" />
       </div>
     </div>
   );

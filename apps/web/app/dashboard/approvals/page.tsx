@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import { CheckCircle, XCircle, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,11 +101,11 @@ export default function ApprovalsPage() {
                         </span>
                       </p>
                     )}
-                    {approval.context && (
+                    {approval.context != null && (
                       <pre className="text-xs text-slate-400 bg-slate-950 rounded p-2 mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap">
                         {typeof approval.context === "string"
                           ? approval.context
-                          : JSON.stringify(approval.context, null, 2)}
+                          : JSON.stringify(approval.context as object, null, 2)}
                       </pre>
                     )}
                   </div>

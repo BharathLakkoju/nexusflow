@@ -1,5 +1,5 @@
 "use client";
-import { SignIn } from "@stackframe/stack";
+import { AuthView } from "@neondatabase/auth-ui";
 
 export default function LoginPage() {
   return (
@@ -9,7 +9,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
           <p className="text-white/50">Sign in to NexusFlow AI</p>
         </div>
-        <SignIn />
+        <AuthView pathname="sign-in" />
       </div>
     </div>
   );

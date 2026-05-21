@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import {
   AreaChart,
   Area,
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                     border: "1px solid #1e293b",
                     borderRadius: 8,
                   }}
-                  formatter={(v: number) => [formatTokens(v), "Tokens"]}
+                  formatter={(v) => [formatTokens(Number(v)), "Tokens"]}
                 />
                 <Bar dataKey="tokens" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               </BarChart>

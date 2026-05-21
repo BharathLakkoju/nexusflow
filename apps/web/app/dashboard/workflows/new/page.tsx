@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useUser } from "@stackframe/stack";
+import { useUser } from "@/lib/auth/hooks";
 import { useRouter } from "next/navigation";
 import type { Node, Edge } from "@xyflow/react";
 import { WorkflowCanvas } from "@/components/workflow/WorkflowCanvas";

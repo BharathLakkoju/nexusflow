@@ -1,22 +1,11 @@
 /**
  * API client: typed fetch wrapper for the NexusFlow backend.
- * All requests include the Stack Auth JWT automatically.
+ * Auth tokens are passed explicitly via the token option from authClient.token().
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  // Fetch from Stack Auth client-side token (cookie-based)
-  if (typeof window !== "undefined") {
-    // Stack Auth stores the token in a cookie; we can also retrieve it from the SDK
-    try {
-      const { useUser } = await import("@stackframe/stack");
-      // Tokens are included automatically via cookies with SameSite when
-      // backend is same domain, but since Render is a different domain,
-      // we need to explicitly pass the token.
-      // Stack Auth token is available in the browser via getAuthTokens()
-    } catch {}
-  }
   return {};
 }
 
