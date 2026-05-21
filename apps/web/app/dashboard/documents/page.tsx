@@ -63,10 +63,13 @@ export default function DocumentsPage() {
     setUploading(true);
     try {
       // Upload via server-side route (keeps BLOB_READ_WRITE_TOKEN secret)
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
-        method: "POST",
-        body: file,
-      });
+      const res = await fetch(
+        `/api/upload?filename=${encodeURIComponent(file.name)}`,
+        {
+          method: "POST",
+          body: file,
+        },
+      );
       if (!res.ok) throw new Error(await res.text());
       const blob = await res.json();
       // Register with API
