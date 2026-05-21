@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@/lib/auth/hooks";
 import {
   AreaChart,
@@ -18,35 +18,55 @@ import {
   Bot,
   Zap,
   DollarSign,
-  TrendingUp,
   CheckCircle,
   XCircle,
+  Sparkles,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { analyticsApi, type AnalyticsDashboard } from "@/lib/api";
+import { analyticsApi, demoApi, type AnalyticsDashboard } from "@/lib/api";
 import { formatCost, formatTokens } from "@/lib/utils";
 
 export default function DashboardPage() {
   const user = useUser();
   const [data, setData] = useState<AnalyticsDashboard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
+  const [seedDone, setSeedDone] = useState(false);
+
+  const loadDashboard = useCallback(async () => {
+    try {
+      const token = await user?.getAuthJson();
+      if (!token?.accessToken) return;
+      const dash = await analyticsApi.dashboard(30, token.accessToken);
+      setData(dash);
+    } catch {
+      // Ignore — user may not have an org yet
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const token = await user?.getAuthJson();
-        if (!token?.accessToken) return;
-        const dash = await analyticsApi.dashboard(30, token.accessToken);
-        setData(dash);
-      } catch {
-        // Ignore — user may not have an org yet
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (user) load();
-  }, [user]);
+    if (user) loadDashboard();
+  }, [user, loadDashboard]);
+
+  const handleSeedDemo = async () => {
+    setSeeding(true);
+    try {
+      const token = await user?.getAuthJson();
+      if (!token?.accessToken) return;
+      await demoApi.seed(token.accessToken);
+      setSeedDone(true);
+      // Reload analytics after seeding
+      await loadDashboard();
+    } catch {
+      // Silently ignore if already seeded
+      setSeedDone(true);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -79,6 +99,28 @@ export default function DashboardPage() {
           Last 30 days · {user?.displayName ?? ""}
         </p>
       </div>
+
+      {/* Demo seed banner — shown when workspace is empty */}
+      {!seedDone && (data?.total_executions ?? 0) === 0 && (
+        <div className="flex items-center justify-between rounded-xl bg-brown-100 border border-brown-200 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-brown-600 shrink-0" />
+            <div>
+              <p className="text-sm font-600 text-brown-900">Load demo data</p>
+              <p className="text-xs text-brown-500 mt-0.5">
+                Populate your workspace with sample workflows, agents, documents, memory and approvals so you can explore every feature immediately.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleSeedDemo}
+            disabled={seeding}
+            className="ml-4 shrink-0 rounded-lg bg-brown-700 px-4 py-2 text-sm font-600 text-brown-50 hover:bg-brown-800 disabled:opacity-50 transition-colors"
+          >
+            {seeding ? "Seeding…" : "Seed Demo Data"}
+          </button>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

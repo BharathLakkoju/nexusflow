@@ -114,6 +114,15 @@ export const approvalsApi = {
     apiFetch<HumanApproval>(`/approvals/${id}/action`, { method: "POST", body: { action, comment }, token }),
 };
 
+// ---- Demo seed ----
+export const demoApi = {
+  seed: (token: string) =>
+    apiFetch<{ seeded: boolean; reason?: string; summary?: Record<string, number> }>(
+      "/demo/seed",
+      { method: "POST", token },
+    ),
+};
+
 // ---- Prompt Studio ----
 export const promptStudioApi = {
   run: (body: PromptRunRequest, token: string) =>

@@ -26,6 +26,7 @@ from app.routers import (
     analytics,
     approvals,
     auth,
+    demo,
     documents,
     keys,
     memory,
@@ -101,6 +102,7 @@ API_PREFIX = "/api/v1"
 
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(organizations.router, prefix=API_PREFIX)
+app.include_router(demo.router, prefix=API_PREFIX)
 app.include_router(keys.router, prefix=API_PREFIX)
 app.include_router(workflows.router, prefix=API_PREFIX)
 app.include_router(agents.router, prefix=API_PREFIX)
