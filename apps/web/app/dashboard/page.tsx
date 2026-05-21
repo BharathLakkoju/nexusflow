@@ -108,7 +108,9 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm font-600 text-brown-900">Load demo data</p>
               <p className="text-xs text-brown-500 mt-0.5">
-                Populate your workspace with sample workflows, agents, documents, memory and approvals so you can explore every feature immediately.
+                Populate your workspace with sample workflows, agents,
+                documents, memory and approvals so you can explore every feature
+                immediately.
               </p>
             </div>
           </div>
