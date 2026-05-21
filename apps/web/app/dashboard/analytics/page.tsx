@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
                     background: "#0f172a",
                     border: "1px solid #1e293b",
                   }}
-                  formatter={(v: number) => [formatCost(v), "Cost"]}
+                  formatter={(v) => [formatCost(Number(v)), "Cost"]}
                 />
                 <Area
                   type="monotone"
