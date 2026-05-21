@@ -54,8 +54,8 @@ def require_org(user: UserInfo = Depends(get_current_user)) -> UserInfo:
     return user
 
 
-# Convenience aliases
-RequireViewer = Depends(require_role("viewer"))
-RequireMember = Depends(require_role("member"))
-RequireAdmin = Depends(require_role("admin"))
-RequireOwner = Depends(require_role("owner"))
+# Convenience aliases (callables — wrap with Depends() at the call site)
+RequireViewer = require_role("viewer")
+RequireMember = require_role("member")
+RequireAdmin = require_role("admin")
+RequireOwner = require_role("owner")
