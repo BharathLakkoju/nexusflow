@@ -4,6 +4,7 @@ All secrets are injected via environment; never hardcoded.
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 
 class Settings(BaseSettings):
@@ -62,6 +63,14 @@ class Settings(BaseSettings):
             url = url.replace("sslmode=require", "ssl=require")
         elif "?" not in url and "neon.tech" in url:
             url += "?ssl=require"
+
+        # Strip libpq-only params (e.g. channel_binding) that asyncpg
+        # rejects as unknown connect() kwargs.
+        parts = urlsplit(url)
+        query = urlencode(
+            [(k, v) for k, v in parse_qsl(parts.query) if k != "channel_binding"]
+        )
+        url = urlunsplit(parts._replace(query=query))
         return url
 
     @property

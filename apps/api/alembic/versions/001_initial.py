@@ -217,7 +217,6 @@ def upgrade() -> None:
         sa.Column("org_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
         sa.Column("chunk_index", sa.Integer(), nullable=False),
-        sa.Column("embedding", sa.Column("embedding")),  # placeholder, raw SQL below
         sa.Column("chunk_metadata", postgresql.JSONB(), server_default="{}"),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
