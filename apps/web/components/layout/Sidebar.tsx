@@ -41,7 +41,7 @@ export function Sidebar() {
     <aside className="w-60 h-screen bg-brown-900 border-r border-brown-800 flex flex-col shrink-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-brown-800">
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/dashboard" className="flex items-center gap-2.5 group">
           <div className="h-7 w-7 rounded-lg bg-brown-600 flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
